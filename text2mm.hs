@@ -19,7 +19,8 @@ removeSuf xs x
 	
 
 --prepare words
-convert w = removePre (foldl removeSuf (map toLower w) ".,)!") '('
+--convert w = removePre (foldl removeSuf (map toLower w) ".,)!") '('
+convert w = removePre (foldl removeSuf w ".,)!") '('
 
 --make pairs out of a list
 pair xs = zip xs (tail xs)
@@ -44,8 +45,6 @@ findItem f xs
    | f (head xs) == True = [head xs]
    | otherwise = findItem f (tail xs)
 
---getNewWord item r 
---   | snd item == []
 
 -- find the word
 -- get random word from its list (of length )
@@ -53,25 +52,33 @@ findItem f xs
 --formStory :: String -> [(String, [String])] -> [Int] -> [String]
 formStory _ _ [] = []
 formStory w listOfWords randomNumbers 
-  | s /= [] = (fst wordItem) ++ " " ++ (formStory (s !! ((length s) `mod` (head randomNumbers) - 1)) listOfWords (tail randomNumbers))
+  | s /= [] = (fst wordItem) ++ " " ++ (formStory (s !! (r `mod` (length s))) listOfWords (tail randomNumbers))
   | otherwise = fst wordItem
   where wordItem = head (findItem ((==) w . fst) listOfWords)
         s = snd wordItem
+        r = head randomNumbers
    
 
 
 main = do
   f <- readFile "example"
+
   -- make a list of all words in lowercase
   let w = map convert ( words [x | x <- f])
+
   --convert to pairs
   let pairs = [(x, y)| (x, y) <- pair w]
+
   --print pairs
   -- get each word with the words that follow it in the text 
   let mapping = [(w', getCountPerWordPairs w' pairs)| w' <- unique w ]
-  --now starting at a random word (let's say "a"), we could start printing the word with the highest likelihood. then find that 
+
+  --now starting at a random word (let's say "a"), we could start printing 
+  --the word with the highest likelihood. then find that 
   --word, and get the most likely word following that one
-  let storyLength = 50
-  n <- forM [1..storyLength] $ \_i -> (getStdRandom (randomR (0, (length mapping) - 1)))
-  -- mapM_ print (map ((!!) mapping) n)
-  print $ formStory "an" mapping n
+  let storyLength = 100
+
+  --create a list of random numbers to generate the story
+  n <- forM [1..storyLength] $ \_i -> (getStdRandom (randomR (0, (length mapping)-1)))
+  print $ formStory "An" mapping n
+  print $ formStory "The" mapping n
