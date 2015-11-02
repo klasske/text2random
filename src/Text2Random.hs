@@ -61,7 +61,7 @@ formStory w listOfWords randomNumbers
 
 
 main = do
-  f <- readFile "example"
+  f <- readFile "wuthr10.txt"
 
   -- make a list of all words in lowercase
   let w = map convert ( words [x | x <- f])
