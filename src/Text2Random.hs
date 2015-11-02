@@ -1,6 +1,7 @@
 import Data.Char (toLower) 
 import Data.List (sort, find)
 import System.Random
+import System.Environment (getArgs)
 import Data.Traversable (forM)
 
 --remove the . at the end of a sentence
@@ -58,10 +59,17 @@ formStory w listOfWords randomNumbers
         s = snd wordItem
         r = head randomNumbers
    
+defArgs [] = ("wuthr10.txt", "100", "the")
+defArgs [filename] = (filename, "100", "the")
+defArgs [filename, words] = (filename, words, "the")
+defArgs [filename, words, first] = (filename, words, first)
 
 
 main = do
-  f <- readFile "wuthr10.txt"
+  args <- getArgs
+  let (fileName, numWords, first) = defArgs args
+
+  f <- readFile fileName
 
   -- make a list of all words in lowercase
   let w = map convert ( words [x | x <- f])
@@ -76,9 +84,8 @@ main = do
   --now starting at a random word (let's say "a"), we could start printing 
   --the word with the highest likelihood. then find that 
   --word, and get the most likely word following that one
-  let storyLength = 100
+  let storyLength = read numWords
 
   --create a list of random numbers to generate the story
   n <- forM [1..storyLength] $ \_i -> (getStdRandom (randomR (0, (length mapping)-1)))
-  print $ formStory "An" mapping n
-  print $ formStory "The" mapping n
+  print $ formStory first mapping n
